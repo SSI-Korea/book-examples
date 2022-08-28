@@ -1,4 +1,4 @@
-// core/did.go
+// core/ecdsa.go
 
 package core
 
