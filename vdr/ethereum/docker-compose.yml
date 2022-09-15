@@ -1,0 +1,10 @@
+version: "3"
+services:
+    # start the ganache cli container
+    ganache-cli:
+        container_name: ganache-cli
+        build:
+            context: ./docker/ganache-cli
+        # note host:container
+        ports:
+            - 8545:8545
