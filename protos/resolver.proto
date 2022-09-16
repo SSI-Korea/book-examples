@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "ssi-book/protos";
+
+package resolver;
+
+service Resolver {
+  rpc ResolveDid (ResolverRequest) returns (ResolverResponse) {}
+}
+
+message ResolverRequest {
+  string did = 1;
+}
+
+message ResolverResponse {
+  string didDocument = 1;
+}
