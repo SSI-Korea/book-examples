@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	CONTRACT_ADDRESS    = "0x219E540089D05826c1a422ebfbB8a1C3348886A7"
-	ACCOUNT_PRIVATE_KEY = "d31fc68bc7e2d3296e462a9510a6549ac32a23627ef2781e25d76c35a130c82a"
+	CONTRACT_ADDRESS    = "0x19df2ECa52A33a8F95478aab33008eFe86A2d8C6"
+	ACCOUNT_PRIVATE_KEY = "dcbd1ab9bf3917040e311b34ebe0baec846791728ee917dbe81b7b8eba871034"
 )
 
 func getAccountAuth(client *ethclient.Client, accountAddress string) *bind.TransactOpts {
