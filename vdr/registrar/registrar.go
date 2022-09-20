@@ -17,7 +17,7 @@ type registrarServer struct {
 func (server *registrarServer) RegisterDid(ctx context.Context, req *protos.RegistrarRequest) (*protos.RegistrarResponse, error) {
 	log.Printf("Register DID: %s\n", req.Did)
 
-	db, err := leveldb.OpenFile("did_db/dids", nil)
+	db, err := leveldb.OpenFile("../did_db/dids", nil)
 	if err != nil {
 		panic(err)
 	}
