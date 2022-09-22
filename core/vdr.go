@@ -11,7 +11,7 @@ import (
 )
 
 func RegisterDid(did string, didDocument string) error {
-	conn, err := grpc.Dial("localhost:9000", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial("localhost:9000", grpc.WithTimeout(5*time.Second), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Printf("Registrar not connect: %v\n", err)
 		return errors.New(fmt.Sprintf("Registrar not connect: %v", err))
@@ -35,7 +35,7 @@ func RegisterDid(did string, didDocument string) error {
 }
 
 func ResolveDid(did string) (string, error) {
-	conn, err := grpc.Dial("localhost:9001", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial("localhost:9001", grpc.WithTimeout(5*time.Second), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Printf("Resolver not connect: %v\n", err)
 		return "", errors.New(fmt.Sprintf("Resolver not connect: %v", err))

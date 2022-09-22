@@ -34,7 +34,10 @@ func main() {
 	fmt.Printf("did => %s\n", did)
 	fmt.Printf("did document => %+v\n", didDocument)
 
-	RegisterDid(did.String(), didDocument)
+	err = RegisterDid(did.String(), didDocument)
+	if err != nil {
+		panic(fmt.Sprintf("Register DID Error: %s", err))
+	}
 
 	//Resolve한다.
 	didDocumentStr, err := core.ResolveDid(did.String())
