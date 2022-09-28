@@ -61,7 +61,7 @@ func (vc *VC) GenerateJWT(verificationId string, pvKey *ecdsa.PrivateKey) (strin
 	t, err := time.Parse(time.RFC3339, vc.IssuanceDate) //unixtime으로 바꾸기 위해.
 	iat := t.Unix()
 	nbf := iat
-	iss := vc.Issuer
+	iss := vc.Issuer // issuer의 DID
 	sub := "Verifiable Credential"
 
 	// Proof를 제거하고 JWT를 만들기 위해 복제한다.
