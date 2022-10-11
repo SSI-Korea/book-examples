@@ -2,6 +2,7 @@ package core
 
 import (
 	"crypto/ecdsa"
+	"errors"
 	"github.com/getlantern/deepcopy"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
@@ -17,6 +18,8 @@ type VP struct {
 	// jwt의 token형식으로 저장한다.
 	VerifiableCredential []string `json:"verifiableCredential"`
 	Proof                *Proof   `json:"proof,omitempty"`
+
+	Token string
 }
 
 // JWT를 위한 claim
@@ -77,5 +80,15 @@ func (vp *VP) GenerateJWT(verificationId string, pvKey *ecdsa.PrivateKey) string
 
 	}
 
+	vp.Token = tokenString
+
 	return tokenString
+}
+
+func (vp *VP) isVerify() (bool, error) {
+	if vp.Token == "" {
+		return false, errors.New("Token is empty.")
+	}
+
+	return true, nil
 }

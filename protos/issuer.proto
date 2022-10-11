@@ -1,0 +1,21 @@
+// protos/issuer.proto
+syntax = "proto3";
+
+option go_package = "ssi-book/protos";
+
+package issuer;
+
+service SimpleIssuer {
+  rpc IssueSimpleVC (MsgRequestVC) returns (MsgResponseVC) {}
+}
+
+message MsgRequestVC {
+  string did = 1;
+  string vp = 2;
+}
+
+message MsgResponseVC {
+  string result = 1;
+  string msg = 2;
+  string vc = 3;
+}
