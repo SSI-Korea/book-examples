@@ -1,4 +1,4 @@
-package CompanyIssuer
+package BankIssuer
 
 import (
 	"context"
@@ -8,13 +8,15 @@ import (
 	"golang.org/x/exp/slices"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"ssi-book/core"
 	"ssi-book/protos"
+	"time"
 )
 
 type Server struct {
-	protos.UnimplementedSimpleIssuerServer
+	protos.UnimplementedMultipleIssuerServer
 
 	Issuer *Issuer
 }
@@ -40,8 +42,8 @@ type VC_CUSTOM_CLAIM struct {
 	data map[string]interface{}
 }
 
-func (server *Server) IssueSimpleVC(_ context.Context, msg *protos.MsgRequestVC) (*protos.MsgResponseVC, error) {
-	log.Printf("IssueSimpleVC MSG: %+v \n", msg)
+func (server *Server) IssueMultipleVC(_ context.Context, msg *protos.MsgRequestMultipleVC) (*protos.MsgResponseMultipleVC, error) {
+	log.Printf("IssueMultipleVC MSG: %+v \n", msg)
 	isVerify, claims, err := core.ParseAndVerifyJwtForVP(msg.Vp)
 	if !isVerify || err != nil {
 		fmt.Println("VP is NOT verified.")
@@ -50,8 +52,9 @@ func (server *Server) IssueSimpleVC(_ context.Context, msg *protos.MsgRequestVC)
 
 	fmt.Println("VP is verified.")
 
-	checkSelfCertification := false
-	checkDiploma := false
+	checkSelfCertification, checkDiploma, checkEmployee := false, false, false
+
+	var vcEmployee map[string]interface{}
 
 	for i, vc := range claims.Vp.VerifiableCredential {
 		fmt.Println("VC: ", vc)
@@ -74,26 +77,49 @@ func (server *Server) IssueSimpleVC(_ context.Context, msg *protos.MsgRequestVC)
 				checkDiploma = true
 			}
 		}
-	}
-
-	if checkSelfCertification && checkDiploma {
-		fmt.Println("VC 발급!!!!")
-
-		response := new(protos.MsgResponseVC)
-
-		server.Issuer.CredentialSubjectJsonFilePath = "data/company_vc.json"
-
-		vcToken, err := server.Issuer.GenerateSampleVC()
-		if err != nil {
+		if slices.Contains(vcType, "CertificateOfEmployment") {
+			vcEmployee = vcClaims["employee"].(map[string]interface{})
+			if vcEmployee["name"] == "HONG KIL DONG" {
+				checkEmployee = true
+			}
 
 		}
+	}
+
+	if checkSelfCertification && checkDiploma && checkEmployee {
+		fmt.Println("VC 발급!!!!")
+
+		response := new(protos.MsgResponseMultipleVC)
+
+		server.Issuer.CredentialSubjectJsonFilePath = "data/bank_account_vc.json"
+
+		vcAccountToken, err := server.Issuer.GenerateSampleVC("AccountCredential")
+		if err != nil {
+			return nil, errors.New("VC Generate Error")
+		}
+
 		response.Result = "OK"
-		response.Vc = vcToken
+		response.Vc = append(response.Vc, vcAccountToken)
+
+		nowDate := time.Now()
+		joinDate, _ := time.Parse("2006-01-02", vcEmployee["join"].(string))
+		diff := nowDate.Sub(joinDate)
+		diffDays := math.Floor(diff.Minutes() / 60 / 24)
+
+		if diffDays >= 180 {
+			server.Issuer.CredentialSubjectJsonFilePath = "data/bank_loan_vc.json"
+
+			vcLoanToken, err := server.Issuer.GenerateSampleVC("LoanCredential")
+			if err != nil {
+				return nil, errors.New("VC Generate Error")
+			}
+			response.Vc = append(response.Vc, vcLoanToken)
+		}
 
 		return response, nil
 	}
 
-	return nil, errors.New("Error")
+	return nil, errors.New("VC condition Error")
 }
 
 func (issuer *Issuer) GenerateDID() {
@@ -121,7 +147,7 @@ func (issuer *Issuer) GenerateDID() {
 	RegisterDid(issuerDid.String(), didDocument)
 }
 
-func (issuer *Issuer) GenerateSampleVC() (string, error) {
+func (issuer *Issuer) GenerateSampleVC(typ string) (string, error) {
 
 	var credentialSubject map[string]interface{}
 
@@ -134,7 +160,7 @@ func (issuer *Issuer) GenerateSampleVC() (string, error) {
 	// VC 생성.
 	vc, err := core.NewVC(
 		"1234567890abccde",
-		[]string{"VerifiableCredential", "CertificateOfEmployment"},
+		[]string{"VerifiableCredential", typ},
 		issuer.did.String(),
 		credentialSubject,
 	)

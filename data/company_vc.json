@@ -1,0 +1,9 @@
+{
+  "id": "1234567890abcde",
+  "employee": {
+    "name": "HONG KIL DONG",
+    "birth": "2000-01-01",
+    "join": "2022-01-01",
+    "salary": "100000000"
+  }
+}

@@ -76,7 +76,9 @@ func (server *Server) IssueSimpleVC(_ context.Context, msg *protos.MsgRequestVC)
 
 			response := new(protos.MsgResponseVC)
 
-			server.Issuer.CredentialSubjectJsonFilePath = "university_vc.json"
+			if server.Issuer.CredentialSubjectJsonFilePath == "" {
+				server.Issuer.CredentialSubjectJsonFilePath = "data/university_vc.json"
+			}
 
 			vcToken, err := server.Issuer.GenerateSampleVC()
 			if err != nil {

@@ -45,7 +45,7 @@ func (holder *Holder) GenerateFirstVC() {
 	// VC 생성.
 	vc, _ := core.NewVC(
 		"1234567890",
-		[]string{"VerifiableCredential", "FirstCredential"},
+		[]string{"VerifiableCredential", "SelfCertification"},
 		holder.Did.String(), // Issuer did
 		map[string]interface{}{
 			"id":        "1234567890",
@@ -105,6 +105,69 @@ func (holder *Holder) RequestVCToUniversityIssuer(vpToken string) error {
 	fmt.Printf("UniversityIssuer's response VC: %s\n", res.Vc)
 	if res.Result == "OK" {
 		holder.VCList = append(holder.VCList, res.Vc)
+	}
+
+	return nil
+}
+
+func (holder *Holder) RequestVCToCompanyIssuer(vpToken string) error {
+	conn, err := grpc.Dial("localhost:1122", grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Printf("CompanyIssuer not connect: %v", err)
+		return err
+	}
+	defer conn.Close()
+	c := protos.NewSimpleIssuerClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	res, err := c.IssueSimpleVC(ctx, &protos.MsgRequestVC{
+		Did: holder.Did.String(),
+		Vp:  vpToken,
+	})
+	if err != nil {
+		log.Printf("could not request: %v", err)
+		return err
+	}
+
+	fmt.Printf("CompanyIssuer's response: %s\n", res.Result)
+	fmt.Printf("CompanyIssuer's response VC: %s\n", res.Vc)
+	if res.Result == "OK" {
+		holder.VCList = append(holder.VCList, res.Vc)
+	}
+
+	return nil
+}
+
+func (holder *Holder) RequestVCToBankIssuer(vpToken string) error {
+	conn, err := grpc.Dial("localhost:1123", grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Printf("BankIssuer not connect: %v", err)
+		return err
+	}
+	defer conn.Close()
+	c := protos.NewMultipleIssuerClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	res, err := c.IssueMultipleVC(ctx, &protos.MsgRequestMultipleVC{
+		Did: holder.Did.String(),
+		Vp:  vpToken,
+	})
+	if err != nil {
+		log.Printf("could not request: %v", err)
+		return err
+	}
+
+	fmt.Printf("BankIssuer's response: %s\n", res.Result)
+
+	if res.Result == "OK" {
+		for _, vc := range res.Vc {
+			fmt.Printf("BankIssuer's response VC: %s\n", vc)
+			holder.VCList = append(holder.VCList, vc)
+		}
 	}
 
 	return nil

@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
-	"ssi-book/actors/issuer/CompanyIssuer"
+	"ssi-book/actors/issuer/BankIssuer"
 	"ssi-book/protos"
 )
 
@@ -13,7 +13,7 @@ func main() {
 	argsWithoutProg := os.Args[1:]
 
 	// New Issuer
-	issr := new(CompanyIssuer.Issuer)
+	issr := new(BankIssuer.Issuer)
 	issr.GenerateDID()
 
 	if len(argsWithoutProg) > 0 {
@@ -21,18 +21,18 @@ func main() {
 		//loadJson(vcCustomFilePath)
 	}
 
-	lis, err := net.Listen("tcp", "localhost:1122")
+	lis, err := net.Listen("tcp", "localhost:1123")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	issuerServer := CompanyIssuer.Server{}
+	issuerServer := BankIssuer.Server{}
 	issuerServer.Issuer = issr
 
 	s := grpc.NewServer()
-	protos.RegisterSimpleIssuerServer(s, &issuerServer)
+	protos.RegisterMultipleIssuerServer(s, &issuerServer)
 
-	log.Printf("CompanyIssuer Server is listening at %v", lis.Addr())
+	log.Printf("BankIssuer Server is listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

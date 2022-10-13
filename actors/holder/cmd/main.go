@@ -33,6 +33,22 @@ func main() {
 
 	hldr.RequestVCToUniversityIssuer(vpToken)
 
+	// CompanyIssuer에게 재직증명 VC를 요청한다.
+	util.PressKey("5. CompanyIssuer에게 재직증명 VC를 요청한다. [아무키나 입력하세요.]")
+	vpToken, _ = hldr.GenerateVP()
+
+	fmt.Printf("VP Token: %s\n", vpToken)
+
+	hldr.RequestVCToCompanyIssuer(vpToken)
+
+	// CompanyIssuer에게 재직증명 VC를 요청한다.
+	util.PressKey("6. BankIssuer에게 계좌 VC와 대출 VC를 요청한다. [아무키나 입력하세요.]")
+	vpToken, _ = hldr.GenerateVP()
+
+	fmt.Printf("VP Token: %s\n", vpToken)
+
+	hldr.RequestVCToBankIssuer(vpToken)
+
 	/*
 	   //	util.PressKey("3. Issuer에게 VC를 요청합니다. [아무키나 입력하세요.]")
 	   	vcToken := holder.RequestVC(hldr.Did.String())

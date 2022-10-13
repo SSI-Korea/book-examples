@@ -1,0 +1,21 @@
+// protos/MultipleIssuer.proto
+syntax = "proto3";
+
+option go_package = "ssi-book/protos";
+
+package MultipleIssuer;
+
+service MultipleIssuer {
+  rpc IssueMultipleVC (MsgRequestMultipleVC) returns (MsgResponseMultipleVC) {}
+}
+
+message MsgRequestMultipleVC {
+  string did = 1;
+  string vp = 2;
+}
+
+message MsgResponseMultipleVC {
+  string result = 1;
+  string msg = 2;
+  repeated string vc = 3;
+}
