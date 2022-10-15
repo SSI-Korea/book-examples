@@ -12,10 +12,11 @@ import (
 )
 
 type Holder struct {
-	Kms         *core.ECDSAManager
-	Did         *core.DID
-	DidDocument *core.DIDDocument
-	VCList      []string
+	Kms          *core.ECDSAManager
+	Did          *core.DID
+	DidDocument  *core.DIDDocument
+	VCList       []string
+	AtomicVCList map[string]string
 }
 
 func (holder *Holder) GenerateDID() {
@@ -171,4 +172,51 @@ func (holder *Holder) RequestVCToBankIssuer(vpToken string) error {
 	}
 
 	return nil
+}
+
+func (holder *Holder) RequestVCToAtomicUniversityIssuer(vpToken string) error {
+	conn, err := grpc.Dial("localhost:1124", grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Printf("AtomicUniversityIssuer not connect: %v", err)
+		return err
+	}
+	defer conn.Close()
+	c := protos.NewAtomicIssuerClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	res, err := c.IssueAtomicVC(ctx, &protos.MsgRequestAtomicVC{
+		Did: holder.Did.String(),
+		Vp:  vpToken,
+	})
+	if err != nil {
+		log.Printf("could not request: %v", err)
+		return err
+	}
+
+	fmt.Printf("AtomicUniversity's response: %s\n", res.Result)
+
+	if res.Result == "OK" {
+		for _, vc := range res.Vcs {
+			fmt.Printf("AtomicUniversity's response VC Name: %s\n", vc.Name)
+			fmt.Printf("AtomicUniversity's response VC Token: %s\n", vc.Token)
+			holder.AtomicVCList[vc.Name] = vc.Token
+		}
+	}
+
+	return nil
+}
+
+func (holder *Holder) PrintAtomicVC() {
+	if holder.AtomicVCList == nil {
+		return
+	}
+	fmt.Println("<< Atomic VC List >>")
+	idx := 1
+	for key, _ := range holder.AtomicVCList {
+		fmt.Println(idx, ". ", key)
+		idx++
+	}
+
 }

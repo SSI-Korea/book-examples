@@ -11,6 +11,7 @@ func main() {
 	fmt.Println("### Start HOLDER's Wallet ###")
 	// New Holder
 	hldr := new(holder.Holder)
+	hldr.AtomicVCList = make(map[string]string)
 
 	util.PressKey("1. DID를 생성합니다. [아무키나 입력하세요.]")
 	hldr.GenerateDID()
@@ -41,7 +42,7 @@ func main() {
 
 	hldr.RequestVCToCompanyIssuer(vpToken)
 
-	// CompanyIssuer에게 재직증명 VC를 요청한다.
+	// BankIssuer에게 재직증명 VC를 요청한다.
 	util.PressKey("6. BankIssuer에게 계좌 VC와 대출 VC를 요청한다. [아무키나 입력하세요.]")
 	vpToken, _ = hldr.GenerateVP()
 
@@ -49,31 +50,16 @@ func main() {
 
 	hldr.RequestVCToBankIssuer(vpToken)
 
-	/*
-	   //	util.PressKey("3. Issuer에게 VC를 요청합니다. [아무키나 입력하세요.]")
-	   	vcToken := holder.RequestVC(hldr.Did.String())
-	   	fmt.Printf("VC Token: %s\n", vcToken)
+	// AtomicUniversityIssuer에게 졸업증명 Atomic VC를 요청한다.
+	util.PressKey("7. AtomicUniversityIssuer에게 졸업증명 Atomic VC를 요청한다. [아무키나 입력하세요.]")
+	vpToken, _ = hldr.GenerateVP()
 
-	   	util.PressKey("4. 전달 받은 VC를 검증합니다. [아무키나 입력하세요.]")
-	   	verify, _, _ := core.ParseAndVerifyJwtForVC(vcToken)
+	fmt.Printf("VP Token: %s\n", vpToken)
 
-	   	if verify {
-	   		fmt.Println("VC is verified.")
-	   	}
+	hldr.RequestVCToAtomicUniversityIssuer(vpToken)
 
-	   	util.PressKey("5. 전달 받은 VC를 VP에 넣어서 Verifier에게 전달합니다. [아무키나 입력하세요.]")
-	   	vcList := []string{}
-	   	vcList = append(vcList, vcToken)
+	// AtomicUniversityIssuer에게 졸업증명 Atomic VC를 요청한다.
+	util.PressKey("8. Atomic VC 목록을 출력한다. [아무키나 입력하세요.]")
+	hldr.PrintAtomicVC()
 
-	   	vp, err := core.NewVP("", []string{"", ""}, "", vcList)
-	   	if err != nil {
-	   		fmt.Println("ERROR")
-	   		os.Exit(0)
-	   	}
-
-	   	vpToken := vp.GenerateJWT(hldr.DidDocument.VerificationMethod[0].Id, hldr.Kms.PrivateKey)
-	   	fmt.Printf("VP Token: %s\n", vpToken)
-
-	   	holder.SubmitVP(vpToken)
-	*/
 }

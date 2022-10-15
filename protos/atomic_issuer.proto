@@ -1,0 +1,26 @@
+// protos/AtomicIssuer.proto
+syntax = "proto3";
+
+option go_package = "ssi-book/protos";
+
+package AtomicIssuer;
+
+service AtomicIssuer {
+  rpc IssueAtomicVC (MsgRequestAtomicVC) returns (MsgResponseAtomicVC) {}
+}
+
+message MsgRequestAtomicVC {
+  string did = 1;
+  string vp = 2;
+}
+
+message MsgResponseAtomicVC {
+  string result = 1;
+  string msg = 2;
+  repeated VC vcs = 3;
+}
+
+message VC {
+  string name = 1;
+  string token = 2;
+}
