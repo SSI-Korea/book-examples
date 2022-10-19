@@ -54,8 +54,6 @@ func main() {
 	util.PressKey("7. AtomicUniversityIssuer에게 졸업증명 Atomic VC를 요청한다. [아무키나 입력하세요.]")
 	vpToken, _ = hldr.GenerateVP()
 
-	fmt.Printf("VP Token: %s\n", vpToken)
-
 	hldr.RequestVCToAtomicUniversityIssuer(vpToken)
 
 	// AtomicUniversityIssuer에게 졸업증명 Atomic VC를 요청한다.

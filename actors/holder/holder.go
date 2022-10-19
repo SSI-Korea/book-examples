@@ -16,7 +16,7 @@ type Holder struct {
 	Did          *core.DID
 	DidDocument  *core.DIDDocument
 	VCList       []string
-	AtomicVCList map[string]string
+	AtomicVCList map[string]string //Atomic VC 저장
 }
 
 func (holder *Holder) GenerateDID() {
@@ -218,5 +218,4 @@ func (holder *Holder) PrintAtomicVC() {
 		fmt.Println(idx, ". ", key)
 		idx++
 	}
-
 }
