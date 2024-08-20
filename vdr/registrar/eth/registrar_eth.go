@@ -4,21 +4,23 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"google.golang.org/grpc"
 	"log"
 	"math/big"
 	"net"
 	"ssi-book/protos"
 	didregistry "ssi-book/vdr/ether"
+
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"google.golang.org/grpc"
 )
 
 const (
-	CONTRACT_ADDRESS    = "0x19df2ECa52A33a8F95478aab33008eFe86A2d8C6"
-	ACCOUNT_PRIVATE_KEY = "dcbd1ab9bf3917040e311b34ebe0baec846791728ee917dbe81b7b8eba871034"
+	CONTRACT_ADDRESS    = "0xa80525f1811e1809546413b29b8731d8f71e72bf"
+	ACCOUNT_PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+	RPC_ENDPOINT        = "http://127.0.0.1:8545"
 )
 
 func getAccountAuth(client *ethclient.Client, accountAddress string) *bind.TransactOpts {
@@ -41,20 +43,26 @@ func getAccountAuth(client *ethclient.Client, accountAddress string) *bind.Trans
 	if err != nil {
 		panic(err)
 	}
-	//fmt.Println("nounce=", nonce)
-	chainID, err := client.ChainID(context.Background())
+	fmt.Println("nounce=", nonce)
+
+	// chainID, err := client.ChainID(context.Background())
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+	auth := bind.NewKeyedTransactor(privateKey)
 	if err != nil {
 		panic(err)
 	}
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)      // in wei
 	auth.GasLimit = uint64(3000000) // in units
-	auth.GasPrice = big.NewInt(1000000)
+	auth.GasPrice = gasPrice        //big.NewInt(16231732509)
 
 	return auth
 }
@@ -66,26 +74,29 @@ type registrarServer struct {
 func (server *registrarServer) RegisterDid(ctx context.Context, req *protos.RegistrarRequest) (*protos.RegistrarResponse, error) {
 	log.Printf("Register DID: %s\n", req.Did)
 
-	client, err := ethclient.Dial("http://127.0.0.1:8545")
+	client, err := ethclient.Dial(RPC_ENDPOINT)
+	// client, err := ethclient.Dial("")
 	if err != nil {
 		panic(err)
 	}
 
-	conn, err := didregistry.NewDidregistry(common.HexToAddress(CONTRACT_ADDRESS), client)
+	instance, err := didregistry.NewDidregistry(common.HexToAddress(CONTRACT_ADDRESS), client)
 	if err != nil {
 		panic(err)
 	}
 
-	txOpts := getAccountAuth(client, ACCOUNT_PRIVATE_KEY)
+	auth := getAccountAuth(client, ACCOUNT_PRIVATE_KEY)
 
-	result, err := conn.CreateDid(txOpts, req.Did, req.DidDocument)
+	tx, err := instance.RegisterDid(auth, req.Did, req.DidDocument)
 	if err != nil {
 		panic(err)
 	}
 
-	_ = result
+	fmt.Printf("tx sent: %s\n", tx.Hash().Hex())
 
-	return &protos.RegistrarResponse{Result: "OK"}, nil
+	_ = tx
+
+	return &protos.RegistrarResponse{Result: tx.Hash().Hex()}, nil
 }
 
 func main() {

@@ -26,11 +26,12 @@ var (
 	_ = common.Big1
 	_ = types.BloomLookup
 	_ = event.NewSubscription
+	_ = abi.ConvertType
 )
 
 // DidregistryMetaData contains all meta data concerning the Didregistry contract.
 var DidregistryMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_did\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_document\",\"type\":\"string\"}],\"name\":\"CreateDid\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_did\",\"type\":\"string\"}],\"name\":\"ResolveDid\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_did\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_document\",\"type\":\"string\"}],\"name\":\"RegisterDid\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_did\",\"type\":\"string\"}],\"name\":\"ResolveDid\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // DidregistryABI is the input ABI used to generate the binding from.
@@ -134,11 +135,11 @@ func NewDidregistryFilterer(address common.Address, filterer bind.ContractFilter
 
 // bindDidregistry binds a generic wrapper to an already deployed contract.
 func bindDidregistry(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
-	parsed, err := abi.JSON(strings.NewReader(DidregistryABI))
+	parsed, err := DidregistryMetaData.GetAbi()
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
+	return bind.NewBoundContract(address, *parsed, caller, transactor, filterer), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -210,23 +211,23 @@ func (_Didregistry *DidregistryCallerSession) ResolveDid(_did string) (string, e
 	return _Didregistry.Contract.ResolveDid(&_Didregistry.CallOpts, _did)
 }
 
-// CreateDid is a paid mutator transaction binding the contract method 0x77aeac44.
+// RegisterDid is a paid mutator transaction binding the contract method 0x841e2cc7.
 //
-// Solidity: function CreateDid(string _did, string _document) returns()
-func (_Didregistry *DidregistryTransactor) CreateDid(opts *bind.TransactOpts, _did string, _document string) (*types.Transaction, error) {
-	return _Didregistry.contract.Transact(opts, "CreateDid", _did, _document)
+// Solidity: function RegisterDid(string _did, string _document) returns()
+func (_Didregistry *DidregistryTransactor) RegisterDid(opts *bind.TransactOpts, _did string, _document string) (*types.Transaction, error) {
+	return _Didregistry.contract.Transact(opts, "RegisterDid", _did, _document)
 }
 
-// CreateDid is a paid mutator transaction binding the contract method 0x77aeac44.
+// RegisterDid is a paid mutator transaction binding the contract method 0x841e2cc7.
 //
-// Solidity: function CreateDid(string _did, string _document) returns()
-func (_Didregistry *DidregistrySession) CreateDid(_did string, _document string) (*types.Transaction, error) {
-	return _Didregistry.Contract.CreateDid(&_Didregistry.TransactOpts, _did, _document)
+// Solidity: function RegisterDid(string _did, string _document) returns()
+func (_Didregistry *DidregistrySession) RegisterDid(_did string, _document string) (*types.Transaction, error) {
+	return _Didregistry.Contract.RegisterDid(&_Didregistry.TransactOpts, _did, _document)
 }
 
-// CreateDid is a paid mutator transaction binding the contract method 0x77aeac44.
+// RegisterDid is a paid mutator transaction binding the contract method 0x841e2cc7.
 //
-// Solidity: function CreateDid(string _did, string _document) returns()
-func (_Didregistry *DidregistryTransactorSession) CreateDid(_did string, _document string) (*types.Transaction, error) {
-	return _Didregistry.Contract.CreateDid(&_Didregistry.TransactOpts, _did, _document)
+// Solidity: function RegisterDid(string _did, string _document) returns()
+func (_Didregistry *DidregistryTransactorSession) RegisterDid(_did string, _document string) (*types.Transaction, error) {
+	return _Didregistry.Contract.RegisterDid(&_Didregistry.TransactOpts, _did, _document)
 }

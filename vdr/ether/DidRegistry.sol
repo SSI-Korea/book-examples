@@ -5,7 +5,7 @@ pragma solidity >=0.7.0 <0.9.0;
 contract SSIKRDid {
     mapping (string => string) _mapDids;
 
-    function CreateDid(string memory _did, string memory _document) public {
+    function RegisterDid(string memory _did, string memory _document) public {
         _mapDids[_did] = _document;
     }
 

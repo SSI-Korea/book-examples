@@ -1,4 +1,4 @@
-package UniversityIssuer
+package RootofTrustIssuer
 
 import (
 	"context"
@@ -52,61 +52,25 @@ func (issuer *Issuer) GenerateDID() {
 }
 
 func (server *Server) IssueSimpleVC(_ context.Context, msg *protos.MsgRequestVC) (*protos.MsgResponseVC, error) {
-	log.Printf("IssueSimpleVC MSG: %+v \n", msg)
-	defer func() {
-		log.Printf("Error!!!")
-		v := recover()
-		fmt.Println("recovered:", v)
-	}()
+	log.Printf("RootOfTrust: %+v \n", msg)
 
-	if msg.Vp == "" || msg.Vp == "NONE" {
-		response := new(protos.MsgResponseVC)
+	fmt.Println("ROT VC 발급!!!!")
 
-		response.Result = "FAIL"
-		response.Vc = "VP is invalid"
+	response := new(protos.MsgResponseVC)
 
-		return response, nil
+	if server.Issuer.CredentialSubjectJsonFilePath == "" {
+		server.Issuer.CredentialSubjectJsonFilePath = "data/rot_vc.json"
 	}
 
-	isVerify, claims, err := core.ParseAndVerifyJwtForVP(msg.Vp)
-	if !isVerify || err != nil {
-		fmt.Println("VP is NOT verified.")
-		return nil, errors.New(fmt.Sprintf("VP is invalid: %s", err))
+	vcToken, err := server.Issuer.GenerateSampleVC()
+	if err != nil {
 	}
 
-	fmt.Println("VP is verified.")
+	response.Result = "OK"
+	response.Vc = vcToken
 
-	for i, vc := range claims.Vp.VerifiableCredential {
-		fmt.Println("VC: ", vc)
-		isVerify, claims, err := core.ParseAndVerifyJwtForVC(vc)
-		if !isVerify || err != nil {
-			fmt.Println("VC #", i, " is NOT verified.")
-			return nil, errors.New(fmt.Sprintf("VC is invalid: %s", err))
-		}
-		fmt.Println("VC is verified.")
-		vcClaims := claims.Vc.CredentialSubject
-		if vcClaims["name"] == "HONG KIL DONG" && vcClaims["birthDate"] == "2000-01-01" {
+	return response, nil
 
-			fmt.Println("VC 발급!!!!")
-
-			response := new(protos.MsgResponseVC)
-
-			if server.Issuer.CredentialSubjectJsonFilePath == "" {
-				server.Issuer.CredentialSubjectJsonFilePath = "data/university_vc.json"
-			}
-
-			vcToken, err := server.Issuer.GenerateSampleVC()
-			if err != nil {
-
-			}
-			response.Result = "OK"
-			response.Vc = vcToken
-
-			return response, nil
-		}
-	}
-
-	return nil, errors.New("Error")
 }
 
 func (issuer *Issuer) GenerateSampleVC() (string, error) {
@@ -124,7 +88,7 @@ func (issuer *Issuer) GenerateSampleVC() (string, error) {
 	// VC 생성.
 	vc, err := core.NewVC(
 		"1234567890",
-		[]string{"VerifiableCredential", "DiplomaOfUniversity"},
+		[]string{"VerifiableCredential", "ResidentRegistrationCredential"},
 		issuer.did.String(),
 		credentialSubject,
 	)

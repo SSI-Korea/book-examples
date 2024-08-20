@@ -3,18 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"ssi-book/protos"
 	didregistry "ssi-book/vdr/ether"
+
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"google.golang.org/grpc"
 )
 
 const (
-	CONTRACT_ADDRESS = "0x19df2ECa52A33a8F95478aab33008eFe86A2d8C6"
+	CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+	RPC_ENDPOINT     = "http://127.0.0.1:8545"
 )
 
 type resolverServer struct {
@@ -28,7 +30,7 @@ func byte2string(b []byte) string {
 func (server *resolverServer) ResolveDid(ctx context.Context, req *protos.ResolverRequest) (*protos.ResolverResponse, error) {
 	log.Printf("Resolve DID: %s\n", req.Did)
 
-	client, err := ethclient.Dial("http://127.0.0.1:8545")
+	client, err := ethclient.Dial(RPC_ENDPOINT)
 	if err != nil {
 		panic(err)
 	}
