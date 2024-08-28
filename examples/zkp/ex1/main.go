@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/consensys/gnark-crypto/ecc"
 	"github.com/consensys/gnark/backend/groth16"
 	"github.com/consensys/gnark/frontend"
@@ -35,9 +37,15 @@ func main() {
 	// witness definition
 	assignment := CubicCircuit{X: 3, Y: 35}
 	witness, _ := frontend.NewWitness(&assignment, ecc.BN254.ScalarField())
+
 	publicWitness, _ := witness.Public()
 
 	// groth16: Prove & Verify
 	proof, _ := groth16.Prove(ccs, pk, witness)
-	groth16.Verify(proof, vk, publicWitness)
+	err := groth16.Verify(proof, vk, publicWitness)
+	if err != nil {
+		fmt.Println("Fail: ", err)
+	} else {
+		fmt.Println("OK")
+	}
 }

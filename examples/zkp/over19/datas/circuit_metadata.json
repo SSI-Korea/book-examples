@@ -1,0 +1,15 @@
+{
+        "circuit": "AgeVerification",
+        "inputs": {
+            "Age": {
+                "type": "secret",
+                "description": "Your actual age (must be an integer)"
+            },
+            "MinAge": {
+                "type": "public",
+                "description": "Minimum age for verification (set to 19)",
+                "value": 19
+            }
+        },
+        "description": "Prove that your age is at least 19 without revealing your actual age"
+    }
