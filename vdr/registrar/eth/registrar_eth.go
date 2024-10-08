@@ -19,8 +19,8 @@ import (
 
 const (
 	CONTRACT_ADDRESS    = "0xa80525f1811e1809546413b29b8731d8f71e72bf"
-	ACCOUNT_PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-	RPC_ENDPOINT        = "http://127.0.0.1:8545"
+	ACCOUNT_PRIVATE_KEY = "6507221d5739137719fe4b8cb7525db6bec424df9d6ce80f4757bfacb094bad5"
+	RPC_ENDPOINT        = "https://sepolia.infura.io/v3/9b7dad30014d4a99a699c10fd47d7803" //"http://127.0.0.1:8545"
 )
 
 func getAccountAuth(client *ethclient.Client, accountAddress string) *bind.TransactOpts {
